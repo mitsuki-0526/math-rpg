@@ -1,0 +1,24 @@
+# ローカル開発サーバー（本番環境では不要）
+server.js
+
+# 開発メモ・計画書（任意：公開したくない場合はコメント解除）
+# DEVELOPMENT_PLAN.md
+
+# Claude Code の設定（リポジトリに含めない）
+.claude/
+
+# OS・エディタ生成ファイル
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# Node.js（node_modules がある場合）
+node_modules/
+npm-debug.log*
+
+# 環境変数ファイル（機密情報）
+.env
+.env.local

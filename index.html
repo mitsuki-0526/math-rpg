@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>世界の理を取り戻す旅 - 数学RPG</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Identity Services SDK -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Noto+Serif+JP:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- タイトル画面 -->
+        <section id="title-screen" class="screen active">
+            <div class="title-content">
+                <h1 class="game-title">世界の理を<br><span class="highlight">取り戻す旅</span></h1>
+                <p class="game-subtitle">〜 中学1年生の数学冒険譚 〜</p>
+
+                <div id="auth-container">
+                    <p class="auth-message">冒険を始めるにはログインしてください</p>
+                    <!-- GIS ボタン -->
+                    <div id="g_id_onload"
+                        data-client_id="954206939501-gqjp1k3fn9jpaovnuhlshje5olcpn5mv.apps.googleusercontent.com"
+                        data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse"
+                        data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+                        data-text="signin_with" data-size="large" data-logo_alignment="left">
+                    </div>
+                </div>
+
+                <div id="player-welcome" class="hidden">
+                    <h2 id="adventure-title">〇〇の冒険</h2>
+                    <button id="start-btn" class="menu-btn">冒険を再開する</button>
+                    <p class="save-note">※セーブデータは自動的に読み込まれます</p>
+                </div>
+            </div>
+
+            <div class="background-overlay"></div>
+        </section>
+
+        <!-- 章クリア演出画面（プロローグと同一スタイル） -->
+        <section id="chapter-clear-screen" class="screen" style="background:#0a0a1a; cursor:pointer; flex-direction:column; gap:0;">
+            <div class="prologue-content">
+                <div class="prologue-speaker-box" id="cc-speaker-box">
+                    <span id="cc-speaker-name"></span>
+                </div>
+                <div class="prologue-text-box">
+                    <p id="cc-text"></p>
+                </div>
+                <div class="prologue-controls">
+                    <span class="prologue-cursor" id="cc-cursor">▼ クリックで次へ</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- プロローグ画面 -->
+        <section id="prologue-screen" class="screen">
+            <button id="prologue-skip-btn" class="skip-btn">スキップ ▶</button>
+            <div class="prologue-content">
+                <div class="prologue-speaker-box" id="prologue-speaker-box">
+                    <span id="prologue-speaker-icon"></span>
+                    <span id="prologue-speaker-name"></span>
+                </div>
+                <div class="prologue-text-box">
+                    <p id="prologue-text"></p>
+                </div>
+                <div class="prologue-controls">
+                    <span class="prologue-cursor" id="prologue-cursor">▼ クリックで次へ</span>
+                    <button id="prologue-next-btn" class="menu-btn hidden">冒険を始める！</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ゲーム画面 (Step 2以降で使用) -->
+        <canvas id="game-canvas" class="hidden"></canvas>
+
+        <!-- メッセージウィンドウ (RPG風) -->
+        <div id="message-window" style="display: none;">
+            <div id="message-content"></div>
+            <div class="message-cursor">▼</div>
+        </div>
+
+        <!-- バトル画面 (Step 4) -->
+        <div id="battle-screen" class="hidden">
+            <div class="battle-main">
+                <div class="enemy-side">
+                    <div class="status-box">
+                        <span class="name">数学の魔物</span>
+                        <div class="hp-bar-container">
+                            <div id="enemy-hp-bar" class="hp-bar" style="width: 100%;"></div>
+                        </div>
+                    </div>
+                    <img id="enemy-img" src="assets/enemy.png" alt="Enemy">
+                </div>
+
+                <div class="player-side">
+                    <div class="status-box">
+                        <span class="name">プレイヤー</span>
+                        <div class="hp-bar-container">
+                            <div id="player-hp-bar" class="hp-bar" style="width: 100%;"></div>
+                        </div>
+                        <span id="player-hp-text" class="hp-text">HP: 100 / 100</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="battle-ui-panel">
+                <div id="battle-message" class="message-box">
+                    どうする？
+                </div>
+
+                <!-- コマンド選択エリア -->
+                <div id="command-select" class="input-area">
+                    <button id="btn-attack" class="menu-btn">たたかう</button>
+                    <button id="btn-potion" class="menu-btn">ポーション</button>
+                </div>
+
+                <!-- 回答入力エリア (初期は非表示) -->
+                <div id="answer-area" class="input-area hidden">
+                    <input type="number" id="answer-input" placeholder="答えを入力">
+                    <button id="submit-answer-btn" class="menu-btn">決定</button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ショップ画面 -->
+        <div id="shop-screen" class="hidden">
+            <div class="shop-panel">
+                <h2 class="shop-title">ショップ</h2>
+                <p id="shop-message" class="shop-message"></p>
+                <ul id="shop-item-list" class="shop-item-list"></ul>
+                <button id="shop-close-btn" class="menu-btn shop-close">閉じる</button>
+            </div>
+        </div>
+
+        <!-- ステータス画面 (Mキーで開閉) -->
+        <div id="status-screen" class="hidden">
+            <div class="status-panel">
+                <h2 class="status-title">📊 ステータス</h2>
+
+                <section class="status-section">
+                    <table class="status-table">
+                        <tr>
+                            <td class="stat-label">名前</td>
+                            <td class="stat-value" id="st-name">—</td>
+                            <td class="stat-label">章</td>
+                            <td class="stat-value" id="st-chapter">—</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-label">HP</td>
+                            <td class="stat-value" id="st-hp" colspan="3">—</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-label">攻撃力</td>
+                            <td class="stat-value" id="st-atk" colspan="3">—</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-label">防御力</td>
+                            <td class="stat-value" id="st-def" colspan="3">—</td>
+                        </tr>
+                        <tr>
+                            <td class="stat-label">コイン</td>
+                            <td class="stat-value" id="st-coins" colspan="3">—</td>
+                        </tr>
+                    </table>
+                </section>
+
+                <section class="status-section">
+                    <h3 class="status-section-title">🎒 所持品</h3>
+                    <div class="status-inventory">
+                        <div class="inv-row">
+                            <span class="inv-label">武器</span>
+                            <span class="inv-value" id="st-weapon">なし</span>
+                        </div>
+                        <div class="inv-row">
+                            <span class="inv-label">防具</span>
+                            <span class="inv-value" id="st-armor">なし</span>
+                        </div>
+                        <div class="inv-row">
+                            <span class="inv-label">ポーション</span>
+                            <span class="inv-value" id="st-potion">0個</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="status-section">
+                    <h3 class="status-section-title">🔮 欠片</h3>
+                    <div class="fragment-bar-wrap">
+                        <div class="fragment-bar-bg">
+                            <div class="fragment-bar-fill" id="st-fragment-bar"></div>
+                        </div>
+                        <span class="fragment-count" id="st-fragments">0 / 10</span>
+                    </div>
+                </section>
+
+                <p class="status-hint">[ M ] キーで閉じる</p>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+</body>
+
+</html>
