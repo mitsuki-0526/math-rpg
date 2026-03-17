@@ -155,7 +155,14 @@ const state = {
         door:   new Image(),
         symbolWeak:   new Image(),
         symbolMedium: new Image(),
-        symbolStrong: new Image()
+        symbolStrong: new Image(),
+        // 街の建物画像
+        bldPlayerHome: new Image(),
+        bldHouseA:     new Image(),
+        bldHouseB:     new Image(),
+        bldHouseC:     new Image(),
+        bldShop:       new Image(),
+        bldLibrary:    new Image()
     }
 };
 
@@ -164,23 +171,26 @@ const MAPS = {
     town: {
         name: "学びの街",
         allowEncounter: false,
-        // tileId 10 = 石畳の道路
+        // tileId 10 = 石畳の道路（3×3建物に対応したマップ）
+        // 北エリア: 主人公の家(col1-3), 図書館(col9-12) ← row1-2がブロック、row3が扉行
+        // 中エリア: 民家A(col1-3), ショップ(col4-6), 民家B(col8-10), 民家C(col11-13) ← row7-8がブロック、row9が扉行
+        // 南エリア: 民家D(col1-3), 民家E(col11-13) ← row11-12がブロック、row13が扉行
         data: [
-            [ 7,  7,  7,  7,  7,  7,  7,  5,  5,  7,  7,  7,  7,  7,  7],
-            [ 7,  0,  0,  0,  0,  0,  0, 10,  0,  0,  0,  0,  0,  0,  7],
-            [ 7,  0,  4,  0,  0,  0,  0, 10,  0,  0,  0,  0,  8,  0,  7],
-            [ 7,  0,  0,  0,  0,  7,  7, 10,  7,  7,  0,  0,  0,  0,  7],
-            [ 7,  0,  0,  0,  0,  7,  7, 10,  7,  7,  0,  0,  0,  0,  7],
-            [ 7, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,  7],
-            [ 7,  0,  0,  0,  0,  0,  0, 10,  0,  0,  0,  0,  0,  0,  7],
-            [ 7,  0,  7,  7,  0,  7,  7, 10,  7,  7,  0,  7,  7,  0,  7],
-            [ 7,  0,  7,  7,  0,  7,  7, 10,  7,  7,  0,  7,  7,  0,  7],
-            [ 7,  0,  2,  0,  0,  0,  0, 10,  0,  0,  0,  0,  0,  0,  7],
-            [ 7, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,  7],
-            [ 7,  0,  0,  0,  7,  7,  0, 10,  0,  7,  7,  0,  0,  0,  7],
-            [ 7,  0,  0,  0,  7,  7,  0, 10,  0,  7,  7,  0,  0,  0,  7],
-            [ 7,  0,  0,  0,  0,  0,  0,  6,  0,  0,  0,  0,  0,  0,  7],
-            [ 7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7]
+            [ 7,  7,  7,  7,  7,  7,  7,  5,  5,  7,  7,  7,  7,  7,  7],  // row0: 上壁 + ダンジョン入口
+            [ 7,  7,  7,  7,  0,  0,  0, 10,  0,  7,  7,  7,  7,  0,  7],  // row1: 建物上部
+            [ 7,  7,  7,  7,  0,  0,  0, 10,  0,  7,  7,  7,  7,  0,  7],  // row2: 建物中部
+            [ 7,  0,  4,  0,  0,  0,  0, 10,  0,  0,  8,  0,  0,  0,  7],  // row3: 扉行（4=主人公の家, 8=図書館）
+            [ 7,  0,  0,  0,  0,  0,  0, 10,  0,  0,  0,  0,  0,  0,  7],  // row4: 通路
+            [ 7, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,  7],  // row5: 横断道路
+            [ 7,  0,  0,  0,  0,  0,  0, 10,  0,  0,  0,  0,  0,  0,  7],  // row6: 通路
+            [ 7,  7,  7,  7,  7,  7,  7, 10,  7,  7,  7,  7,  7,  7,  7],  // row7: 中央建物上部
+            [ 7,  7,  7,  7,  7,  7,  7, 10,  7,  7,  7,  7,  7,  7,  7],  // row8: 中央建物中部
+            [ 7,  0,  4,  0,  0,  4,  0, 10,  0,  4,  0,  0,  4,  0,  7],  // row9: 扉行（民家A/ショップ/民家B/民家C）
+            [ 7, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,  7],  // row10: 横断道路
+            [ 7,  7,  7,  7,  0,  0,  0, 10,  0,  0,  0,  7,  7,  7,  7],  // row11: 南建物上部
+            [ 7,  7,  7,  7,  0,  0,  0, 10,  0,  0,  0,  7,  7,  7,  7],  // row12: 南建物中部
+            [ 7,  0,  4,  0,  0,  2,  0,  6,  0,  0,  0,  0,  4,  0,  7],  // row13: 扉行 + NPC + 帰還口
+            [ 7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7]   // row14: 下壁
         ]
     },
     // 以下3フロアはゲーム開始後 DungeonGenerator によって上書きされるスタブ
@@ -1702,14 +1712,22 @@ class GameEngine {
                 } else if (tileId === 7) {
                     // 街マップでは建物ブロック内タイルをスキップ（_drawTownBuildings()で描画）
                     const isTownBuilding = state.currentMapId === 'town' && (
-                        (row >= 3  && row <= 4  && col >= 5  && col <= 6)  ||  // 民家A
-                        (row >= 3  && row <= 4  && col >= 8  && col <= 9)  ||  // ショップ
-                        (row >= 7  && row <= 8  && col >= 2  && col <= 3)  ||  // 民家D
-                        (row >= 7  && row <= 8  && col >= 5  && col <= 6)  ||  // 民家E
-                        (row >= 7  && row <= 8  && col >= 8  && col <= 9)  ||  // 民家F
-                        (row >= 7  && row <= 8  && col >= 11 && col <= 12) ||  // 民家G
-                        (row >= 11 && row <= 12 && col >= 4  && col <= 5)  ||  // 民家H
-                        (row >= 11 && row <= 12 && col >= 9  && col <= 10)     // 民家I
+                        // 北エリア: 主人公の家 (col1-3, row1-2)
+                        (row >= 1  && row <= 2  && col >= 1  && col <= 3)  ||
+                        // 北エリア: 図書館 (col9-12, row1-2)
+                        (row >= 1  && row <= 2  && col >= 9  && col <= 12) ||
+                        // 中エリア: 民家A (col1-3, row7-8)
+                        (row >= 7  && row <= 8  && col >= 1  && col <= 3)  ||
+                        // 中エリア: ショップ (col4-6, row7-8)
+                        (row >= 7  && row <= 8  && col >= 4  && col <= 6)  ||
+                        // 中エリア: 民家B (col8-10, row7-8)
+                        (row >= 7  && row <= 8  && col >= 8  && col <= 10) ||
+                        // 中エリア: 民家C (col11-13, row7-8)
+                        (row >= 7  && row <= 8  && col >= 11 && col <= 13) ||
+                        // 南エリア: 民家D (col1-3, row11-12)
+                        (row >= 11 && row <= 12 && col >= 1  && col <= 3)  ||
+                        // 南エリア: 民家E (col11-13, row11-12)
+                        (row >= 11 && row <= 12 && col >= 11 && col <= 13)
                     );
                     if (!isTownBuilding) {
                         this.ctx.fillStyle = '#888';
@@ -1791,41 +1809,100 @@ class GameEngine {
         // 3.5 フォグオブウォー（ダンジョンのみ・HUDの下に描画）
         this.drawFog();
 
-        // 4. HUD描画
-        this.drawHud();
+        // 4. HUD描画（メニュー画面に情報を集約したため非表示）
+        // this.drawHud();
     }
 
-    _drawTownBuildings() {
+    // ── タイル組み立て式 建物1棟描画 ──────────────────────────────
+    // bx,by: 建物左上のピクセル座標  cols: タイル幅(3 or 4)
+    // type: 'house' | 'shop' | 'library'
+    _drawBuilding(bx, by, cols, type) {
         const ctx = this.ctx;
-        const T = TILE_SIZE;
-        const wc = state.assets.worldChip;
+        const T   = TILE_SIZE;           // 32px
+        const mc  = state.assets.mainChip;
         ctx.imageSmoothingEnabled = false;
 
-        // === 上エリア（row1〜4）===
-        // 主人公の家（小さな建物）: source(112,144,16,32) → col1-2, row1-2
-        ctx.drawImage(wc, 112, 144, 16, 32,  1*T, 1*T, 2*T, 2*T);
-        // 図書館（大きな城）: source(48,144,48,32) → col11-13, row1-3
-        ctx.drawImage(wc,  48, 144, 48, 32, 11*T, 1*T, 3*T, 3*T);
-        // 民家A（赤屋根）: source(0,144,32,32) → col5-6, row3-4
-        ctx.drawImage(wc,   0, 144, 32, 32,  5*T, 3*T, 2*T, 2*T);
-        // ショップ（青屋根）: source(32,144,32,32) → col8-9, row3-4
-        ctx.drawImage(wc,  32, 144, 32, 32,  8*T, 3*T, 2*T, 2*T);
+        // ── タイルヘルパー (source 16×16 → T×T) ──
+        const S   = (dx, dy) => ctx.drawImage(mc,   0, 560, 16, 16, bx+dx, by+dy, T, T); // 石レンガ壁
+        const DT  = (dx, dy) => ctx.drawImage(mc, 112, 608, 16, 16, bx+dx, by+dy, T, T); // 扉・上半分
+        const DB  = (dx, dy) => ctx.drawImage(mc, 112, 624, 16, 16, bx+dx, by+dy, T, T); // 扉・下半分
+        const WL  = (dx, dy) => ctx.drawImage(mc,   0, 608, 16, 16, bx+dx, by+dy, T, T); // 窓・左ペイン
+        const WR  = (dx, dy) => ctx.drawImage(mc,  16, 608, 16, 16, bx+dx, by+dy, T, T); // 窓・右ペイン
 
-        // === 中エリア（row7〜8）: 4棟 ===
-        // 民家D（赤屋根）: col2-3, row7-8
-        ctx.drawImage(wc,   0, 144, 32, 32,  2*T, 7*T, 2*T, 2*T);
-        // 民家E（グレーの城）: col5-6, row7-8
-        ctx.drawImage(wc,  64, 144, 32, 32,  5*T, 7*T, 2*T, 2*T);
-        // 民家F（青屋根）: col8-9, row7-8
-        ctx.drawImage(wc,  32, 144, 32, 32,  8*T, 7*T, 2*T, 2*T);
-        // 民家G（石の塔）: col11-12, row7-8
-        ctx.drawImage(wc,  96, 144, 16, 32, 11*T, 7*T, 2*T, 2*T);
+        // ── 壁タイル配置 ──────────────────────────
+        if (cols === 3) {
+            // 3T幅: [石][窓1枚][石] / [石][扉上][石] / [石][扉下][石]
+            S(0, 0);   WL(T, 0);   S(2*T, 0);   // Row0: 石・窓・石
+            S(0, T);   DT(T, T);   S(2*T, T);   // Row1: 石・扉上・石
+            S(0,2*T);  DB(T,2*T);  S(2*T,2*T);  // Row2: 石・扉下・石
+        } else {
+            // 4T幅（図書館）: [石][窓左][窓右][石] / [石][扉上×2][石] / [石][扉下×2][石]
+            S(0,0);   WL(T,0);   WR(2*T,0);  S(3*T,0);   // Row0: 石・窓×2・石
+            S(0,T);   DT(T,T);   DT(2*T,T);  S(3*T,T);   // Row1: 石・扉上×2・石
+            S(0,2*T); DB(T,2*T); DB(2*T,2*T);S(3*T,2*T); // Row2: 石・扉下×2・石
+        }
 
-        // === 下エリア（row11〜12）: 2棟 ===
-        // 民家H（赤屋根）: col4-5, row11-12
-        ctx.drawImage(wc,   0, 144, 32, 32,  4*T, 11*T, 2*T, 2*T);
-        // 民家I（石の塔）: col9-10, row11-12
-        ctx.drawImage(wc,  96, 144, 16, 32,  9*T, 11*T, 2*T, 2*T);
+        // ── 屋根（三角形）―― Row0の上端から上に向かって描画 ──
+        const W = cols * T;
+        const roofH = Math.round(T * 0.75);  // 屋根の高さ
+
+        const ROOF = {
+            house:   { main:'#8b3a0a', shade:'#5a2005', eave:'#3d1502' },
+            shop:    { main:'#c03010', shade:'#801800', eave:'#500f00' },
+            library: { main:'#2a5f8e', shade:'#1a3a5c', eave:'#0f2336' },
+        }[type] || { main:'#8b3a0a', shade:'#5a2005', eave:'#3d1502' };
+
+        // 屋根メイン（左面：明るい）
+        ctx.fillStyle = ROOF.main;
+        ctx.beginPath();
+        ctx.moveTo(bx - 2,      by);
+        ctx.lineTo(bx + W/2,    by - roofH);
+        ctx.lineTo(bx + W + 2,  by);
+        ctx.closePath();
+        ctx.fill();
+
+        // 屋根右面（影：暗い）
+        ctx.fillStyle = ROOF.shade;
+        ctx.beginPath();
+        ctx.moveTo(bx + W/2,    by - roofH);
+        ctx.lineTo(bx + W + 2,  by);
+        ctx.lineTo(bx + W/2,    by);
+        ctx.closePath();
+        ctx.fill();
+
+        // 軒（庇ライン）
+        ctx.fillStyle = ROOF.eave;
+        ctx.fillRect(bx - 2, by - 2, W + 4, 4);
+
+        // ショップのみ看板追加
+        if (type === 'shop') {
+            ctx.fillStyle = '#d4a017';
+            ctx.fillRect(bx + T - 2, by + 2, 2*T - 12, 12);
+            ctx.fillStyle = '#5c3000';
+            ctx.font = 'bold 9px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('SHOP', bx + T*1.5, by + 12);
+            ctx.textAlign = 'left';
+        }
+    }
+
+    // ── 全建物の描画エントリポイント ──────────────────────────────
+    _drawTownBuildings() {
+        const T = TILE_SIZE;
+
+        // === 北エリア ===
+        this._drawBuilding(1*T,  1*T, 3, 'house');    // 主人公の家 (col1-3)
+        this._drawBuilding(9*T,  1*T, 4, 'library');  // 図書館    (col9-12)
+
+        // === 中エリア ===
+        this._drawBuilding( 1*T, 7*T, 3, 'house');   // 民家A (col1-3)
+        this._drawBuilding( 4*T, 7*T, 3, 'shop');    // ショップ (col4-6)
+        this._drawBuilding( 8*T, 7*T, 3, 'house');   // 民家B (col8-10)
+        this._drawBuilding(11*T, 7*T, 3, 'house');   // 民家C (col11-13)
+
+        // === 南エリア ===
+        this._drawBuilding( 1*T, 11*T, 3, 'house');  // 民家D (col1-3)
+        this._drawBuilding(11*T, 11*T, 3, 'house');  // 民家E (col11-13)
     }
 
     drawFog() {
@@ -2133,6 +2210,12 @@ window.onload = () => {
     state.assets.symbolWeak.src   = 'assets/symbol_weak.png';
     state.assets.symbolMedium.src = 'assets/symbol_medium.png';
     state.assets.symbolStrong.src = 'assets/symbol_strong.png';
+    state.assets.bldPlayerHome.src = 'assets/player_home.png';
+    state.assets.bldHouseA.src     = 'assets/house_a.png';
+    state.assets.bldHouseB.src     = 'assets/house_b.png';
+    state.assets.bldHouseC.src     = 'assets/house_c.png';
+    state.assets.bldShop.src       = 'assets/shop.png';
+    state.assets.bldLibrary.src    = 'assets/library.png';
     prologue = new PrologueManager();
     console.log("Assets loading started.");
 };

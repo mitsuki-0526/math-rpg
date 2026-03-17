@@ -194,6 +194,23 @@ body {
     color: #000;
 }
 
+/* 認証エリア全体を縦並び中央揃え */
+#auth-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+/* Google GIS ボタン（iframe）を中央揃え */
+.g_id_signin {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
 /* ゲストプレイボタン */
 .guest-divider {
     display: flex;
