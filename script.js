@@ -146,11 +146,13 @@ const state = {
     // ダンジョン入場時のコイン・欠片（死亡時ロスト用）
     dungeonEntry: { coins: 0, fragments: 0 },
     assets: {
-        mapchip: new Image(),
+        mapchip:    new Image(),   // ダンジョン床用（旧）
+        worldChip:  new Image(),   // ぴぽや世界マップチップ（草・建物）
+        mainChip:   new Image(),   // ぴぽやメインチップ（道・宝箱・装飾）
         player: new Image(),
-        enemy: new Image(),
-        npc: new Image(),
-        door: new Image(),
+        enemy:  new Image(),
+        npc:    new Image(),
+        door:   new Image(),
         symbolWeak:   new Image(),
         symbolMedium: new Image(),
         symbolStrong: new Image()
@@ -162,22 +164,23 @@ const MAPS = {
     town: {
         name: "学びの街",
         allowEncounter: false,
+        // tileId 10 = 石畳の道路
         data: [
-            [7, 7, 7, 7, 7, 7, 7, 5, 5, 7, 7, 7, 7, 7, 7],
-            [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
-            [7, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 7],
-            [7, 0, 0, 0, 0, 7, 7, 0, 7, 7, 0, 0, 0, 0, 7],
-            [7, 0, 0, 0, 0, 7, 7, 0, 7, 7, 0, 0, 0, 0, 7],
-            [7, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
-            [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
-            [7, 0, 0, 0, 7, 7, 0, 0, 0, 7, 7, 0, 0, 0, 7],
-            [7, 0, 0, 0, 7, 7, 0, 6, 0, 7, 7, 0, 0, 0, 7],
-            [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
-            [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
-            [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
-            [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
-            [7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7],
-            [7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
+            [ 7,  7,  7,  7,  7,  7,  7,  5,  5,  7,  7,  7,  7,  7,  7],
+            [ 7,  0,  0,  0,  0,  0,  0, 10,  0,  0,  0,  0,  0,  0,  7],
+            [ 7,  0,  4,  0,  0,  0,  0, 10,  0,  0,  0,  0,  8,  0,  7],
+            [ 7,  0,  0,  0,  0,  7,  7, 10,  7,  7,  0,  0,  0,  0,  7],
+            [ 7,  0,  0,  0,  0,  7,  7, 10,  7,  7,  0,  0,  0,  0,  7],
+            [ 7, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,  7],
+            [ 7,  0,  0,  0,  0,  0,  0, 10,  0,  0,  0,  0,  0,  0,  7],
+            [ 7,  0,  7,  7,  0,  7,  7, 10,  7,  7,  0,  7,  7,  0,  7],
+            [ 7,  0,  7,  7,  0,  7,  7, 10,  7,  7,  0,  7,  7,  0,  7],
+            [ 7,  0,  2,  0,  0,  0,  0, 10,  0,  0,  0,  0,  0,  0,  7],
+            [ 7, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,  7],
+            [ 7,  0,  0,  0,  7,  7,  0, 10,  0,  7,  7,  0,  0,  0,  7],
+            [ 7,  0,  0,  0,  7,  7,  0, 10,  0,  7,  7,  0,  0,  0,  7],
+            [ 7,  0,  0,  0,  0,  0,  0,  6,  0,  0,  0,  0,  0,  0,  7],
+            [ 7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7,  7]
         ]
     },
     // 以下3フロアはゲーム開始後 DungeonGenerator によって上書きされるスタブ
@@ -1349,7 +1352,7 @@ class Player {
             // tileId 12（宝箱）・13（空箱）は常に通行不可（向いて Enter で調べる）
             let passable;
             if (state.currentMapId === 'town') {
-                passable = tileId === 0 || tileId === 5 || tileId === 8;
+                passable = tileId === 0 || tileId === 5 || tileId === 6 || tileId === 8 || tileId === 10;
             } else if (state.currentMapId === 'library') {
                 passable = tileId === 0 || tileId === 6;
             } else {
@@ -1617,12 +1620,17 @@ class GameEngine {
             for (let col = 0; col < mapData[row].length; col++) {
                 const x = col * TILE_SIZE;
                 const y = row * TILE_SIZE;
-                // 屋内の場合は床(mapchipの別箇所)、屋外は草
+                // 屋内の場合は床、屋外は草（ぴぽやworldChip r4 c0）
                 if (state.currentMapId === 'library') {
-                    this.ctx.fillStyle = '#2c3e50'; // 深い青灰色の床
+                    this.ctx.fillStyle = '#2c3e50';
                     this.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                } else {
+                } else if (DUNGEON_CONFIGS[state.currentMapId]) {
+                    // ダンジョン: 旧mapchipの石床
                     this.ctx.drawImage(state.assets.mapchip, 0, 128, TILE_SIZE, TILE_SIZE, x, y, TILE_SIZE, TILE_SIZE);
+                } else {
+                    // 街: ぴぽや草タイル (worldChip x=0, y=64, 16×16 → 32×32)
+                    this.ctx.imageSmoothingEnabled = false;
+                    this.ctx.drawImage(state.assets.worldChip, 0, 64, 16, 16, x, y, TILE_SIZE, TILE_SIZE);
                 }
             }
         }
@@ -1641,25 +1649,78 @@ class GameEngine {
                     // 商人
                     this.ctx.drawImage(state.assets.npc, 32, 0, TILE_SIZE, TILE_SIZE, x, y, TILE_SIZE, TILE_SIZE);
                 } else if (tileId === 4) {
-                    // 自宅/ベッド (赤茶色)
-                    this.ctx.fillStyle = '#8b4513';
-                    this.ctx.fillRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
+                    // 自宅/ベッド - 街マップでは建物画像で描画するためスキップ
+                    if (state.currentMapId !== 'town') {
+                        this.ctx.fillStyle = '#8b4513';
+                        this.ctx.fillRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
+                    }
                 } else if (tileId === 5) {
-                    // ダンジョン入り口 (青)
-                    this.ctx.fillStyle = 'blue';
-                    this.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                    // ダンジョン入り口（街の北壁に組み込まれたアーチ型入口）
+                    if (state.currentMapId === 'town') {
+                        // 石壁色を背景に、暗い石アーチ風の描画
+                        this.ctx.fillStyle = '#555';
+                        this.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        // アーチの穴（暗い紫 = ダンジョンへの通路）
+                        this.ctx.fillStyle = '#2a1040';
+                        this.ctx.fillRect(x + 4, y + 2, TILE_SIZE - 8, TILE_SIZE - 2);
+                        // アーチ上部の石装飾
+                        this.ctx.fillStyle = '#777';
+                        this.ctx.fillRect(x + 2, y, TILE_SIZE - 4, 6);
+                    } else {
+                        this.ctx.fillStyle = '#333';
+                        this.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        this.ctx.fillStyle = '#7b2d8b';
+                        this.ctx.fillRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
+                    }
                 } else if (tileId === 6) {
-                    // 街への帰還口 (黄色)
-                    this.ctx.fillStyle = 'yellow';
-                    this.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                    // 街への帰還口 / ダンジョン出口
+                    if (state.currentMapId === 'town') {
+                        // 帰還口：草タイルの上に光るポータルサークル
+                        this.ctx.imageSmoothingEnabled = false;
+                        this.ctx.drawImage(state.assets.worldChip, 0, 64, 16, 16, x, y, TILE_SIZE, TILE_SIZE);
+                        this.ctx.fillStyle = 'rgba(0, 200, 255, 0.35)';
+                        this.ctx.beginPath();
+                        this.ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, TILE_SIZE / 2 - 2, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        this.ctx.strokeStyle = 'rgba(100, 240, 255, 0.9)';
+                        this.ctx.lineWidth = 2;
+                        this.ctx.stroke();
+                    } else {
+                        // ダンジョン出口：黄色ポータル
+                        this.ctx.fillStyle = 'rgba(255, 220, 0, 0.9)';
+                        this.ctx.beginPath();
+                        this.ctx.arc(x + TILE_SIZE / 2, y + TILE_SIZE / 2, TILE_SIZE / 2 - 2, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        this.ctx.strokeStyle = '#ff8800';
+                        this.ctx.lineWidth = 2;
+                        this.ctx.stroke();
+                    }
+                } else if (tileId === 10) {
+                    // 石畳の道路 (worldChip x=16, y=64, 16×16 → 32×32)
+                    this.ctx.imageSmoothingEnabled = false;
+                    this.ctx.drawImage(state.assets.worldChip, 16, 64, 16, 16, x, y, TILE_SIZE, TILE_SIZE);
                 } else if (tileId === 7) {
-                    // NPCの家 (灰色)
-                    this.ctx.fillStyle = 'grey';
-                    this.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                    // 街マップでは建物ブロック内タイルをスキップ（_drawTownBuildings()で描画）
+                    const isTownBuilding = state.currentMapId === 'town' && (
+                        (row >= 3  && row <= 4  && col >= 5  && col <= 6)  ||  // 民家A
+                        (row >= 3  && row <= 4  && col >= 8  && col <= 9)  ||  // ショップ
+                        (row >= 7  && row <= 8  && col >= 2  && col <= 3)  ||  // 民家D
+                        (row >= 7  && row <= 8  && col >= 5  && col <= 6)  ||  // 民家E
+                        (row >= 7  && row <= 8  && col >= 8  && col <= 9)  ||  // 民家F
+                        (row >= 7  && row <= 8  && col >= 11 && col <= 12) ||  // 民家G
+                        (row >= 11 && row <= 12 && col >= 4  && col <= 5)  ||  // 民家H
+                        (row >= 11 && row <= 12 && col >= 9  && col <= 10)     // 民家I
+                    );
+                    if (!isTownBuilding) {
+                        this.ctx.fillStyle = '#888';
+                        this.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                    }
                 } else if (tileId === 8) {
-                    // 図書館入口 (ドア風)
-                    this.ctx.fillStyle = '#6e4b3b';
-                    this.ctx.fillRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+                    // 図書館入口 - 街マップでは建物画像で描画するためスキップ
+                    if (state.currentMapId !== 'town') {
+                        this.ctx.fillStyle = '#6e4b3b';
+                        this.ctx.fillRect(x + 2, y + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+                    }
                 } else if (tileId === 9) {
                     // 本棚 (屋内用)
                     this.ctx.fillStyle = '#4b2c20';
@@ -1692,41 +1753,34 @@ class GameEngine {
                     this.ctx.textAlign = 'left';
                     this.ctx.textBaseline = 'top';
                 } else if (tileId === 12) {
-                    // 宝箱（未開封）
-                    const bx = x + 3, by = y + 6, bw = TILE_SIZE - 6, bh = TILE_SIZE - 10;
-                    // 箱本体
-                    this.ctx.fillStyle = '#7a4a10';
-                    this.ctx.fillRect(bx, by + 6, bw, bh - 6);
-                    // 蓋
-                    this.ctx.fillStyle = '#a05c14';
-                    this.ctx.fillRect(bx, by, bw, 8);
-                    // 金の縁取り
-                    this.ctx.strokeStyle = '#ffd700';
-                    this.ctx.lineWidth = 1.5;
-                    this.ctx.strokeRect(bx, by, bw, bh);
-                    // 中央の錠前
-                    this.ctx.fillStyle = '#ffd700';
-                    this.ctx.fillRect(bx + bw / 2 - 3, by + bh / 2 - 3, 6, 6);
-                    this.ctx.lineWidth = 1;
+                    // 宝箱（未開封）: mainChip x=48, y=864, 16×16 → 32×32
+                    this.ctx.imageSmoothingEnabled = false;
+                    this.ctx.drawImage(state.assets.mainChip, 48, 864, 16, 16, x, y, TILE_SIZE, TILE_SIZE);
                 } else if (tileId === 13) {
-                    // 空箱（開封済み）
-                    const bx = x + 3, by = y + 6, bw = TILE_SIZE - 6, bh = TILE_SIZE - 10;
-                    // 箱本体（暗め）
-                    this.ctx.fillStyle = '#3a2008';
-                    this.ctx.fillRect(bx, by + 6, bw, bh - 6);
-                    // 蓋（開いた状態：上にずらして描画）
-                    this.ctx.fillStyle = '#5a3010';
-                    this.ctx.fillRect(bx, by - 4, bw, 7);
-                    // くすんだ縁取り
-                    this.ctx.strokeStyle = '#886622';
-                    this.ctx.lineWidth = 1.5;
-                    this.ctx.strokeRect(bx, by, bw, bh);
-                    this.ctx.lineWidth = 1;
+                    // 空箱（開封済み）: 暗くグレーアウトして表示
+                    this.ctx.imageSmoothingEnabled = false;
+                    this.ctx.drawImage(state.assets.mainChip, 48, 864, 16, 16, x, y, TILE_SIZE, TILE_SIZE);
+                    // 半透明の暗いオーバーレイで「開封済み」を表現
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+                    this.ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                    // 「済」マーク
+                    this.ctx.fillStyle = 'rgba(200, 200, 200, 0.8)';
+                    this.ctx.font = `bold ${TILE_SIZE * 0.4}px sans-serif`;
+                    this.ctx.textAlign = 'center';
+                    this.ctx.textBaseline = 'middle';
+                    this.ctx.fillText('済', x + TILE_SIZE / 2, y + TILE_SIZE / 2);
+                    this.ctx.textAlign = 'left';
+                    this.ctx.textBaseline = 'top';
                 }
             }
         }
 
-        // 2.5 敵シンボル描画（プレイヤーの下レイヤー）
+        // 2.5 街の建物スプライト描画
+        if (state.currentMapId === 'town') {
+            this._drawTownBuildings();
+        }
+
+        // 2.6 敵シンボル描画（プレイヤーの下レイヤー）
         for (const enemy of state.floorEnemies) {
             enemy.draw(this.ctx);
         }
@@ -1739,6 +1793,39 @@ class GameEngine {
 
         // 4. HUD描画
         this.drawHud();
+    }
+
+    _drawTownBuildings() {
+        const ctx = this.ctx;
+        const T = TILE_SIZE;
+        const wc = state.assets.worldChip;
+        ctx.imageSmoothingEnabled = false;
+
+        // === 上エリア（row1〜4）===
+        // 主人公の家（小さな建物）: source(112,144,16,32) → col1-2, row1-2
+        ctx.drawImage(wc, 112, 144, 16, 32,  1*T, 1*T, 2*T, 2*T);
+        // 図書館（大きな城）: source(48,144,48,32) → col11-13, row1-3
+        ctx.drawImage(wc,  48, 144, 48, 32, 11*T, 1*T, 3*T, 3*T);
+        // 民家A（赤屋根）: source(0,144,32,32) → col5-6, row3-4
+        ctx.drawImage(wc,   0, 144, 32, 32,  5*T, 3*T, 2*T, 2*T);
+        // ショップ（青屋根）: source(32,144,32,32) → col8-9, row3-4
+        ctx.drawImage(wc,  32, 144, 32, 32,  8*T, 3*T, 2*T, 2*T);
+
+        // === 中エリア（row7〜8）: 4棟 ===
+        // 民家D（赤屋根）: col2-3, row7-8
+        ctx.drawImage(wc,   0, 144, 32, 32,  2*T, 7*T, 2*T, 2*T);
+        // 民家E（グレーの城）: col5-6, row7-8
+        ctx.drawImage(wc,  64, 144, 32, 32,  5*T, 7*T, 2*T, 2*T);
+        // 民家F（青屋根）: col8-9, row7-8
+        ctx.drawImage(wc,  32, 144, 32, 32,  8*T, 7*T, 2*T, 2*T);
+        // 民家G（石の塔）: col11-12, row7-8
+        ctx.drawImage(wc,  96, 144, 16, 32, 11*T, 7*T, 2*T, 2*T);
+
+        // === 下エリア（row11〜12）: 2棟 ===
+        // 民家H（赤屋根）: col4-5, row11-12
+        ctx.drawImage(wc,   0, 144, 32, 32,  4*T, 11*T, 2*T, 2*T);
+        // 民家I（石の塔）: col9-10, row11-12
+        ctx.drawImage(wc,  96, 144, 16, 32,  9*T, 11*T, 2*T, 2*T);
     }
 
     drawFog() {
@@ -2026,12 +2113,23 @@ document.getElementById('start-btn').addEventListener('click', () => {
     prologue.start();
 });
 
+// ゲストプレイボタン：Google ログインをスキップしてプロローグへ
+document.getElementById('guest-btn').addEventListener('click', () => {
+    state.playerName = 'ゲスト';
+    state.userId = 'guest_' + Math.random().toString(36).slice(2, 8);
+    document.getElementById('title-screen').classList.remove('active');
+    document.getElementById('prologue-screen').classList.add('active');
+    prologue.start();
+});
+
 window.onload = () => {
-    state.assets.mapchip.src = 'assets/mapchip.png';
+    state.assets.mapchip.src   = 'assets/mapchip.png';
+    state.assets.worldChip.src = 'assets/mapchip320x240world.png';
+    state.assets.mainChip.src  = 'assets/mapchip320x240.png';
     state.assets.player.src = 'assets/player.png';
-    state.assets.enemy.src = 'assets/enemy.png';
-    state.assets.npc.src = 'assets/npc.png';
-    state.assets.door.src = 'assets/door_chap1.png';
+    state.assets.enemy.src  = 'assets/enemy.png';
+    state.assets.npc.src    = 'assets/npc.png';
+    state.assets.door.src   = 'assets/door_chap1.png';
     state.assets.symbolWeak.src   = 'assets/symbol_weak.png';
     state.assets.symbolMedium.src = 'assets/symbol_medium.png';
     state.assets.symbolStrong.src = 'assets/symbol_strong.png';
