@@ -497,6 +497,9 @@ class PrologueManager {
             engine = new GameEngine();
             engine.start();
         }
+        // プレイヤーをtown中央（col=7, row=13）に配置
+        engine.player.x = 7 * TILE_SIZE;
+        engine.player.y = 13 * TILE_SIZE;
     }
 }
 
@@ -1362,7 +1365,8 @@ class Player {
             // tileId 12（宝箱）・13（空箱）は常に通行不可（向いて Enter で調べる）
             let passable;
             if (state.currentMapId === 'town') {
-                passable = tileId === 0 || tileId === 5 || tileId === 6 || tileId === 8 || tileId === 10;
+                // 0:草, 2:NPC前, 4:扉前, 5:ダンジョン入口, 6:帰還口, 8:図書館入口, 10:石畳
+                passable = tileId === 0 || tileId === 2 || tileId === 4 || tileId === 5 || tileId === 6 || tileId === 8 || tileId === 10;
             } else if (state.currentMapId === 'library') {
                 passable = tileId === 0 || tileId === 6;
             } else {
